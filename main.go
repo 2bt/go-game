@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 	"github.com/hajimehoshi/ebiten/inpututil"
 )
 
@@ -13,14 +12,30 @@ const (
 	screenHeight = 240
 )
 
-var sprite *ebiten.Image
+var player Player
 
-var x float64
-var y float64
+type Input struct {
+	x int
+	y int
+	a bool
+	b bool
+}
 
-func init() {
-	var _ error
-	sprite, _, _ = ebitenutil.NewImageFromFile("sprite.png", ebiten.FilterDefault)
+func getInput() Input {
+	var input Input
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		input.y--
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		input.y++
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		input.x--
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		input.x++
+	}
+	return input
 }
 
 func update(screen *ebiten.Image) error {
@@ -30,34 +45,25 @@ func update(screen *ebiten.Image) error {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		y -= 1
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		y += 1
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		x -= 1
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		x += 1
-	}
+	player.Update(getInput())
 
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
 
-	o := ebiten.DrawImageOptions{}
-	o.GeoM.Translate(x, y)
-	screen.DrawImage(sprite, &o)
+	player.Draw(screen)
 
-	ebitenutil.DebugPrint(screen, "Hello, World!")
+	// ebitenutil.DebugPrint(screen, "Hello, World!")
 
 	return nil
 }
 
 func main() {
-	if err := ebiten.Run(update, screenWidth, screenHeight, 2, "Hello, World!"); err != nil {
+
+	player.Init()
+
+	err := ebiten.Run(update, screenWidth, screenHeight, 2, "go-game")
+	if err != nil {
 		log.Fatal(err)
 	}
 }
