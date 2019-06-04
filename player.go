@@ -7,10 +7,10 @@ import (
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
-var playerSprite *ebiten.Image
+var playerImg *ebiten.Image
 
 func init() {
-	playerSprite, _, _ = ebitenutil.NewImageFromFile("data/player.png", ebiten.FilterDefault)
+	playerImg, _, _ = ebitenutil.NewImageFromFile("data/player.png", ebiten.FilterDefault)
 }
 
 type Player struct {
@@ -44,12 +44,14 @@ func (p *Player) Draw(screen *ebiten.Image) {
 	}
 	o.GeoM.Translate(p.x, p.y)
 
-	f := 0
+	fx := 0
+	fy := 0
 	if p.vx != 0 {
-		f = p.tick/4%2 + 1
+		fx = p.tick / 2 % 4 * 16
+		fy = 16
 	}
 
-	frame := playerSprite.SubImage(image.Rect(f*16, 0, f*16+16, 16)).(*ebiten.Image)
+	frame := playerImg.SubImage(image.Rect(fx, fy, fx+16, fy+16)).(*ebiten.Image)
 
 	screen.DrawImage(frame, &o)
 

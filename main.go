@@ -12,10 +12,15 @@ const (
 	screenHeight = 225
 )
 
-var player Player
+var player = Player{
+	x:   screenWidth/2 - 8,
+	y:   screenHeight/2 - 8,
+	dir: 1,
+}
+var world *World
 
 func init() {
-	player.dir = 1
+	world = NewWorld("data/level-1.txt")
 }
 
 type Input struct {
@@ -55,6 +60,7 @@ func update(screen *ebiten.Image) error {
 		return nil
 	}
 
+	world.Draw(screen)
 	player.Draw(screen)
 
 	// ebitenutil.DebugPrint(screen, "Hello, World!")
