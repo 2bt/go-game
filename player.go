@@ -21,10 +21,6 @@ type Player struct {
 	tick int
 }
 
-func (p *Player) Init() {
-	p.dir = 1
-}
-
 func (p *Player) Update(input Input) {
 
 	var speed float64 = 1

@@ -14,6 +14,10 @@ const (
 
 var player Player
 
+func init() {
+	player.dir = 1
+}
+
 type Input struct {
 	x int
 	y int
@@ -59,9 +63,6 @@ func update(screen *ebiten.Image) error {
 }
 
 func main() {
-
-	player.Init()
-
 	err := ebiten.Run(update, screenWidth, screenHeight, 2, "go-game")
 	if err != nil {
 		log.Fatal(err)
