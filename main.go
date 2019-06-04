@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	screenWidth  = 320
-	screenHeight = 240
+	screenWidth  = 400
+	screenHeight = 225
 )
 
 var player Player
@@ -63,7 +63,7 @@ func update(screen *ebiten.Image) error {
 }
 
 func main() {
-	err := ebiten.Run(update, screenWidth, screenHeight, 2, "go-game")
+	err := ebiten.Run(update, screenWidth, screenHeight, 3, "go-game")
 	if err != nil {
 		log.Fatal(err)
 	}
