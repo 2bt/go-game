@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"image"
 	"log"
 	"os"
@@ -18,8 +17,20 @@ var worldTileSpriteMap map[byte]*ebiten.Image
 
 func init() {
 	worldImg, _, _ = ebitenutil.NewImageFromFile("data/world.png", ebiten.FilterDefault)
-	worldTileSpriteMap = map[byte]*ebiten.Image{
-		'0': worldImg.SubImage(image.Rect(0, 0, TileSize, TileSize)).(*ebiten.Image),
+
+
+
+	worldTileSpriteMap = make(map[byte]*ebiten.Image)
+
+	for k, v := range map[byte]int{
+		'0': 0x0000,
+		'L': 0x0002,
+		'H': 0x0004,
+	} {
+		x := v & 0xff
+		y := (v >> 8) & 0xff
+		rect := image.Rect(x * TileSize, y * TileSize, (x + 1) * TileSize, (y + 1) * TileSize)
+		worldTileSpriteMap[k] = worldImg.SubImage(rect).(*ebiten.Image)
 	}
 
 }
@@ -47,13 +58,6 @@ func NewWorld(path string) *World {
 		if len(s.Bytes()) > w.width {
 			w.width = len(s.Bytes())
 		}
-	}
-
-	for y := 0; y < w.height; y++ {
-		for x := 0; x < w.width; x++ {
-			fmt.Printf(" %02x", w.tileAt(x, y))
-		}
-		fmt.Println("")
 	}
 
 	return w
