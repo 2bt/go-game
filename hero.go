@@ -11,7 +11,7 @@ var heroIdleImg *ebiten.Image
 var heroRunImg *ebiten.Image
 
 func init() {
-	heroIdleImg, _, _ = ebitenutil.NewImageFromFile("data/hero-idle2.png", ebiten.FilterDefault)
+	heroIdleImg, _, _ = ebitenutil.NewImageFromFile("data/hero-idle.png", ebiten.FilterDefault)
 	heroRunImg, _, _ = ebitenutil.NewImageFromFile("data/hero-run.png", ebiten.FilterDefault)
 }
 
