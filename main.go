@@ -12,7 +12,7 @@ const (
 	screenHeight = 225
 )
 
-var player = Player{
+var hero = Hero{
 	x:   screenWidth/2 - 8,
 	y:   screenHeight/2 - 8,
 	dir: 1,
@@ -54,14 +54,14 @@ func update(screen *ebiten.Image) error {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
 
-	player.Update(getInput())
+	hero.Update(getInput())
 
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
 
 	world.Draw(screen)
-	player.Draw(screen)
+	hero.Draw(screen)
 
 	// ebitenutil.DebugPrint(screen, "Hello, World!")
 
