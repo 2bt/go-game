@@ -12,15 +12,21 @@ const (
 	screenHeight = 225
 )
 
-var hero = Hero{
-	x:   screenWidth/2 - 8,
-	y:   screenHeight/2 - 8,
-	dir: 1,
+type Game struct {
+	world *World
+	hero  *Hero
 }
-var world *World
 
-func init() {
-	world = NewWorld("data/level-1.txt")
+func NewGame() (*Game, error) {
+	g := &Game{
+		world: NewWorld("data/level-1.txt"),
+		hero: &Hero{
+			x:   screenWidth/2 - 8,
+			y:   screenHeight/2 - 8,
+			dir: 1,
+		},
+	}
+	return g, nil
 }
 
 type Input struct {
@@ -47,29 +53,43 @@ func getInput() Input {
 	return input
 }
 
+func (g *Game) Update() error {
+	g.hero.Update(getInput())
+	return nil
+}
+
+func (g *Game) Draw(screen *ebiten.Image) {
+	g.world.Draw(screen)
+	g.hero.Draw(screen)
+	// ebitenutil.DebugPrint(screen, "Hello, World!")
+}
+
+var game *Game
+
 func update(screen *ebiten.Image) error {
+	if err := game.Update(); err != nil {
+		return err
+	}
 
 	// toggle fullscreen
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
 
-	hero.Update(getInput())
-
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
-
-	world.Draw(screen)
-	hero.Draw(screen)
-
-	// ebitenutil.DebugPrint(screen, "Hello, World!")
-
+	game.Draw(screen)
 	return nil
 }
 
 func main() {
-	err := ebiten.Run(update, screenWidth, screenHeight, 3, "go-game")
+	var err error
+	game, err = NewGame()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ebiten.Run(update, screenWidth, screenHeight, 3, "go-game")
 	if err != nil {
 		log.Fatal(err)
 	}

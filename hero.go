@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
@@ -15,22 +16,31 @@ func init() {
 	heroRunImg, _, _ = ebitenutil.NewImageFromFile("data/hero-run.png", ebiten.FilterDefault)
 }
 
+type Dir int
+
+const (
+	DirRight Dir = 0
+	DirLeft  Dir = 1
+)
+
 type Hero struct {
 	x    float64
 	y    float64
 	vx   float64
-	dir  float64
+	dir  Dir
 	tick int
 }
 
 func (h *Hero) Update(input Input) {
 
-	var speed float64 = 1
-
-	if input.x != 0 {
-		h.dir = float64(input.x)
+	// turn
+	if input.x > 0 {
+		h.dir = DirRight
+	} else if input.x < 0 {
+		h.dir = DirLeft
 	}
 
+	var speed float64 = 1
 	h.vx = float64(input.x) * speed
 	h.x += h.vx
 	h.y += float64(input.y) * speed
@@ -40,9 +50,9 @@ func (h *Hero) Update(input Input) {
 
 func (h *Hero) Draw(screen *ebiten.Image) {
 	o := ebiten.DrawImageOptions{}
-	if h.dir == -1 {
-		o.GeoM.Scale(h.dir, 1)
-		o.GeoM.Translate(32, 0)
+	o.GeoM.Translate(-16, -24)
+	if h.dir == DirLeft {
+		o.GeoM.Scale(-1, 1)
 	}
 	o.GeoM.Translate(h.x, h.y)
 
@@ -58,4 +68,6 @@ func (h *Hero) Draw(screen *ebiten.Image) {
 		screen.DrawImage(frame, &o)
 	}
 
+	// debugging rect
+	ebitenutil.DrawRect(screen, h.x-7, h.y-19, 14, 19, color.RGBA{100, 0, 0, 100})
 }
