@@ -47,13 +47,13 @@ func (h *Hero) Draw(screen *ebiten.Image) {
 	o.GeoM.Translate(h.x, h.y)
 
 	if h.vx != 0 {
-		f := h.tick / 4 % 8
-		rect := image.Rect(f*32, 0, (f+1)*32, 32)
+		frameSpeed := h.tick / 4 % 8
+		rect := image.Rect(frameSpeed*32, 0, (frameSpeed+1)*32, 32)
 		frame := heroRunImg.SubImage(rect).(*ebiten.Image)
 		screen.DrawImage(frame, &o)
 	} else {
-		f := 0
-		rect := image.Rect(f*32, 0, (f+1)*32, 32)
+		frameSpeed := 0
+		rect := image.Rect(frameSpeed*32, 0, (frameSpeed+1)*32, 32)
 		frame := heroIdleImg.SubImage(rect).(*ebiten.Image)
 		screen.DrawImage(frame, &o)
 	}

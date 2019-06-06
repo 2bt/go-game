@@ -18,8 +18,6 @@ var worldTileSpriteMap map[byte]*ebiten.Image
 func init() {
 	worldImg, _, _ = ebitenutil.NewImageFromFile("data/world.png", ebiten.FilterDefault)
 
-
-
 	worldTileSpriteMap = make(map[byte]*ebiten.Image)
 
 	for k, v := range map[byte]int{
@@ -29,7 +27,7 @@ func init() {
 	} {
 		x := v & 0xff
 		y := (v >> 8) & 0xff
-		rect := image.Rect(x * TileSize, y * TileSize, (x + 1) * TileSize, (y + 1) * TileSize)
+		rect := image.Rect(x*TileSize, y*TileSize, (x+1)*TileSize, (y+1)*TileSize)
 		worldTileSpriteMap[k] = worldImg.SubImage(rect).(*ebiten.Image)
 	}
 
