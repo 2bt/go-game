@@ -50,6 +50,9 @@ func getInput() Input {
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		input.x++
 	}
+	input.a = ebiten.IsKeyPressed(ebiten.KeyX)
+	input.b = ebiten.IsKeyPressed(ebiten.KeyC)
+
 	return input
 }
 
