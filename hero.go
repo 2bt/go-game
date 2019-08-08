@@ -24,6 +24,7 @@ type Hero struct {
 	vy          float64
 	inAir       bool
 	jumpControl bool
+	oldJump     bool
 	dir         Dir
 	tick        int
 }
@@ -80,12 +81,29 @@ func (h *Hero) Update(input Input) {
 		h.inAir = true
 	}
 
-	if !h.inAir {
-		if input.A {
+	jump := input.A
+
+	if h.inAir {
+		// jump higher
+		if h.jumpControl {
+			if !jump && h.vy < -1 {
+				h.vy = -1
+				h.jumpControl = false
+			}
+			if !jump || h.vy > -1 {
+				h.jumpControl = false
+			}
+		}
+
+	} else {
+		// jump
+		if jump && !h.oldJump {
 			h.inAir = true
+			h.jumpControl = true
 			h.vy = -7
 		}
 	}
+	h.oldJump = jump
 
 	h.tick++
 }
