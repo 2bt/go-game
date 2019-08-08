@@ -12,63 +12,6 @@ const (
 	screenHeight = 225
 )
 
-type Game struct {
-	world *World
-	hero  *Hero
-}
-
-func NewGame() (*Game, error) {
-	g := &Game{
-		world: NewWorld("data/level-1.txt"),
-		hero: &Hero{
-			x:   screenWidth / 2,
-			y:   screenHeight / 2,
-			dir: 1,
-		},
-	}
-	return g, nil
-}
-
-type Input struct {
-	X int
-	Y int
-	A bool
-	B bool
-}
-
-func getInput() Input {
-	var input Input
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		input.Y--
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		input.Y++
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		input.X--
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		input.X++
-	}
-	input.A = ebiten.IsKeyPressed(ebiten.KeyX)
-	input.B = ebiten.IsKeyPressed(ebiten.KeyC)
-
-	return input
-}
-
-func (g *Game) Update() error {
-	g.hero.Update(getInput())
-	return nil
-}
-
-func (g *Game) Draw(screen *ebiten.Image) {
-	g.world.Draw(screen)
-	g.hero.Draw(screen)
-	// ebitenutil.DebugPrint(screen, "Hello, World!")
-}
-
-var game *Game
-
 func update(screen *ebiten.Image) error {
 	if err := game.Update(); err != nil {
 		return err

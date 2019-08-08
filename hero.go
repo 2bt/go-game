@@ -13,8 +13,8 @@ var heroJumpSprites = LoadSprites("data/hero-jump.png", 0)
 type Dir int
 
 const (
-	DirRight Dir = 0
-	DirLeft  Dir = 1
+	Right Dir = 0
+	Left  Dir = 1
 )
 
 type Hero struct {
@@ -36,10 +36,10 @@ const MaxSpeedY = 4
 func (h *Hero) Update(input Input) {
 
 	// turn
-	if input.X > 0 {
-		h.dir = DirRight
-	} else if input.X < 0 {
-		h.dir = DirLeft
+	if input.x > 0 {
+		h.dir = Right
+	} else if input.x < 0 {
+		h.dir = Left
 	}
 
 	// x movement and collision
@@ -47,8 +47,8 @@ func (h *Hero) Update(input Input) {
 	if h.inAir {
 		accel = 0.125
 	}
-	if input.X != 0 {
-		h.vx += float64(input.X) * accel
+	if input.x != 0 {
+		h.vx += float64(input.x) * accel
 		h.vx = Clamp(h.vx, -MaxSpeedX, MaxSpeedX)
 	} else if h.vx > 0 {
 		h.vx = math.Max(0, h.vx-accel)
@@ -81,7 +81,7 @@ func (h *Hero) Update(input Input) {
 		h.inAir = true
 	}
 
-	jump := input.A
+	jump := input.jump
 
 	if h.inAir {
 		// jump higher
@@ -105,13 +105,18 @@ func (h *Hero) Update(input Input) {
 	}
 	h.oldJump = jump
 
+	// fire a bullet
+	if input.shoot {
+		game.AddBullet(h.x, h.y, h.dir)
+	}
+
 	h.tick++
 }
 
 func (h *Hero) Draw(screen *ebiten.Image) {
 	o := ebiten.DrawImageOptions{}
 	o.GeoM.Translate(-16, -24)
-	if h.dir == DirLeft {
+	if h.dir == Left {
 		o.GeoM.Scale(-1, 1)
 	}
 	o.GeoM.Translate(h.x, h.y)
