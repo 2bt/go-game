@@ -8,15 +8,9 @@ import (
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
-var heroIdleImg *ebiten.Image
-var heroRunImg *ebiten.Image
-var heroJumpImg *ebiten.Image
-
-func init() {
-	heroIdleImg, _, _ = ebitenutil.NewImageFromFile("data/hero-idle.png", ebiten.FilterDefault)
-	heroRunImg, _, _ = ebitenutil.NewImageFromFile("data/hero-run.png", ebiten.FilterDefault)
-	heroJumpImg, _, _ = ebitenutil.NewImageFromFile("data/hero-jump.png", ebiten.FilterDefault)
-}
+var heroIdleImg, _, _ = ebitenutil.NewImageFromFile("data/hero-idle.png", ebiten.FilterDefault)
+var heroRunImg, _, _ = ebitenutil.NewImageFromFile("data/hero-run.png", ebiten.FilterDefault)
+var heroJumpImg, _, _ = ebitenutil.NewImageFromFile("data/hero-jump.png", ebiten.FilterDefault)
 
 type Dir int
 

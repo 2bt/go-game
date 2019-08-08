@@ -2,24 +2,20 @@ package main
 
 import (
 	"bufio"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 	"image"
 	"log"
 	"os"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 const TileSize = 16
 
-var worldImg *ebiten.Image
-var worldTileSpriteMap map[byte]*ebiten.Image
+var worldImg, _, _ = ebitenutil.NewImageFromFile("data/world.png", ebiten.FilterDefault)
+var worldTileSpriteMap = make(map[byte]*ebiten.Image)
 
 func init() {
-	worldImg, _, _ = ebitenutil.NewImageFromFile("data/world.png", ebiten.FilterDefault)
-
-	worldTileSpriteMap = make(map[byte]*ebiten.Image)
-
 	for k, v := range map[byte]int{
 		'0': 0x0000,
 		'L': 0x0002,
@@ -30,7 +26,6 @@ func init() {
 		rect := image.Rect(x*TileSize, y*TileSize, (x+1)*TileSize, (y+1)*TileSize)
 		worldTileSpriteMap[k] = worldImg.SubImage(rect).(*ebiten.Image)
 	}
-
 }
 
 type World struct {
@@ -40,7 +35,6 @@ type World struct {
 }
 
 func NewWorld(path string) *World {
-
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
