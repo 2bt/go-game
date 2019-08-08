@@ -28,54 +28,63 @@ type Hero struct {
 	tick        int
 }
 
+const Gravity = 0.5
+const MaxSpeedX = 1.5
+const MaxSpeedY = 4
+
 func (h *Hero) Update(input Input) {
 
 	// turn
-	if input.x > 0 {
+	if input.X > 0 {
 		h.dir = DirRight
-	} else if input.x < 0 {
+	} else if input.X < 0 {
 		h.dir = DirLeft
 	}
 
-	const gravity = 0.5
-	const maxSpeedX = 1.5
-	const maxSpeedY = 4
-
-	// x movement
+	// x movement and collision
 	accel := 0.5
 	if h.inAir {
 		accel = 0.125
 	}
-	if input.x != 0 {
-		h.vx += float64(input.x) * accel
-		h.vx = Clamp(h.vx, -maxSpeedX, maxSpeedX)
+	if input.X != 0 {
+		h.vx += float64(input.X) * accel
+		h.vx = Clamp(h.vx, -MaxSpeedX, MaxSpeedX)
 	} else if h.vx > 0 {
 		h.vx = math.Max(0, h.vx-accel)
 	} else if h.vx < 0 {
 		h.vx = math.Min(0, h.vx+accel)
 	}
-
-	// y movement
-	h.vy += gravity
-
-	// set new pos
 	h.x += h.vx
-	h.y += Clamp(h.vy, -maxSpeedY, maxSpeedY)
 
-	// TODO: collision
-	if h.y > 208 {
-		h.y = 208
+	dist := game.world.CheckCollision(AxisX, &Box{
+		h.x - 7, h.y - 19, 14, 19,
+	})
+	if dist != 0 {
+		h.x += dist
+	}
+
+	// y movement and collision
+	h.vy += Gravity
+	h.y += Clamp(h.vy, -MaxSpeedY, MaxSpeedY)
+
+	dist = game.world.CheckCollision(AxisY, &Box{
+		h.x - 7, h.y - 19, 14, 19,
+	})
+	if dist != 0 {
+		h.y += dist
 		h.vy = 0
-		h.inAir = false
+		if dist < 0 {
+			h.inAir = false
+		}
+	} else {
+		h.inAir = true
+	}
 
-		// jumping
-		if input.a {
+	if !h.inAir {
+		if input.A {
 			h.inAir = true
 			h.vy = -7
 		}
-
-	} else {
-		h.inAir = true
 	}
 
 	h.tick++
@@ -110,6 +119,5 @@ func (h *Hero) Draw(screen *ebiten.Image) {
 
 	screen.DrawImage(frame, &o)
 
-	// debugging rect
 	// ebitenutil.DrawRect(screen, h.x-7, h.y-19, 14, 19, color.RGBA{100, 0, 0, 100})
 }

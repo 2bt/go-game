@@ -30,28 +30,28 @@ func NewGame() (*Game, error) {
 }
 
 type Input struct {
-	x int
-	y int
-	a bool
-	b bool
+	X int
+	Y int
+	A bool
+	B bool
 }
 
 func getInput() Input {
 	var input Input
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		input.y--
+		input.Y--
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		input.y++
+		input.Y++
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		input.x--
+		input.X--
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		input.x++
+		input.X++
 	}
-	input.a = ebiten.IsKeyPressed(ebiten.KeyX)
-	input.b = ebiten.IsKeyPressed(ebiten.KeyC)
+	input.A = ebiten.IsKeyPressed(ebiten.KeyX)
+	input.B = ebiten.IsKeyPressed(ebiten.KeyC)
 
 	return input
 }
