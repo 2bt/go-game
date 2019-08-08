@@ -21,8 +21,8 @@ func NewGame() (*Game, error) {
 	g := &Game{
 		world: NewWorld("data/level-1.txt"),
 		hero: &Hero{
-			x:   screenWidth/2 - 8,
-			y:   screenHeight/2 - 8,
+			x:   screenWidth / 2,
+			y:   screenHeight / 2,
 			dir: 1,
 		},
 	}

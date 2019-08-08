@@ -1,16 +1,14 @@
 package main
 
 import (
-	"image"
 	"math"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
-var heroIdleImg, _, _ = ebitenutil.NewImageFromFile("data/hero-idle.png", ebiten.FilterDefault)
-var heroRunImg, _, _ = ebitenutil.NewImageFromFile("data/hero-run.png", ebiten.FilterDefault)
-var heroJumpImg, _, _ = ebitenutil.NewImageFromFile("data/hero-jump.png", ebiten.FilterDefault)
+var heroIdleSprites = LoadSprites("data/hero-idle.png", 0)
+var heroRunSprites = LoadSprites("data/hero-run.png", 0)
+var heroJumpSprites = LoadSprites("data/hero-jump.png", 0)
 
 type Dir int
 
@@ -28,10 +26,6 @@ type Hero struct {
 	jumpControl bool
 	dir         Dir
 	tick        int
-}
-
-func Clamp(x, a, b float64) float64 {
-	return math.Max(a, math.Min(b, x))
 }
 
 func (h *Hero) Update(input Input) {
@@ -95,6 +89,8 @@ func (h *Hero) Draw(screen *ebiten.Image) {
 	}
 	o.GeoM.Translate(h.x, h.y)
 
+	var frame *ebiten.Image
+
 	if h.inAir {
 		f := 3
 		switch {
@@ -105,20 +101,14 @@ func (h *Hero) Draw(screen *ebiten.Image) {
 		case h.vy < 4:
 			f = 2
 		}
-		rect := image.Rect(f*32, 0, (f+1)*32, 32)
-		frame := heroJumpImg.SubImage(rect).(*ebiten.Image)
-		screen.DrawImage(frame, &o)
+		frame = heroJumpSprites[f]
 	} else if h.vx != 0 {
-		f := h.tick / 4 % 8
-		rect := image.Rect(f*32, 0, (f+1)*32, 32)
-		frame := heroRunImg.SubImage(rect).(*ebiten.Image)
-		screen.DrawImage(frame, &o)
+		frame = heroRunSprites[h.tick/4%8]
 	} else {
-		f := 0
-		rect := image.Rect(f*32, 0, (f+1)*32, 32)
-		frame := heroIdleImg.SubImage(rect).(*ebiten.Image)
-		screen.DrawImage(frame, &o)
+		frame = heroIdleSprites[0]
 	}
+
+	screen.DrawImage(frame, &o)
 
 	// debugging rect
 	// ebitenutil.DrawRect(screen, h.x-7, h.y-19, 14, 19, color.RGBA{100, 0, 0, 100})

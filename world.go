@@ -2,8 +2,6 @@ package main
 
 import (
 	"bufio"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
-	"image"
 	"log"
 	"os"
 
@@ -12,19 +10,16 @@ import (
 
 const TileSize = 16
 
-var worldImg, _, _ = ebitenutil.NewImageFromFile("data/world.png", ebiten.FilterDefault)
+var worldSprites = LoadSprites("data/world.png", 16)
 var worldTileSpriteMap = make(map[byte]*ebiten.Image)
 
 func init() {
 	for k, v := range map[byte]int{
-		'0': 0x0000,
-		'L': 0x0002,
-		'H': 0x0004,
+		'0': 0,
+		'L': 2,
+		'H': 4,
 	} {
-		x := v & 0xff
-		y := (v >> 8) & 0xff
-		rect := image.Rect(x*TileSize, y*TileSize, (x+1)*TileSize, (y+1)*TileSize)
-		worldTileSpriteMap[k] = worldImg.SubImage(rect).(*ebiten.Image)
+		worldTileSpriteMap[k] = worldSprites[v]
 	}
 }
 
