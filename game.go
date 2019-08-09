@@ -7,7 +7,7 @@ import (
 type Game struct {
 	world   *World
 	hero    *Hero
-	bullets []*Bullet
+	bullets Entities
 }
 
 func NewGame() (*Game, error) {
@@ -24,15 +24,7 @@ func NewGame() (*Game, error) {
 
 func (g *Game) Update() error {
 	g.hero.Update(getInput())
-
-	i := 0
-	for _, b := range g.bullets {
-		if b.Update() {
-			g.bullets[i] = b
-			i++
-		}
-	}
-	g.bullets = g.bullets[:i]
+	g.bullets.Update()
 
 	return nil
 }
@@ -44,9 +36,7 @@ func (g *Game) AddBullet(b *Bullet) {
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.world.Draw(screen)
 	g.hero.Draw(screen)
-	for _, b := range g.bullets {
-		b.Draw(screen)
-	}
+	g.bullets.Draw(screen)
 	// ebitenutil.DebugPrint(screen, "Hello, World!")
 }
 
