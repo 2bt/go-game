@@ -14,11 +14,20 @@ const TileSize = 16
 var worldSprites = LoadSprites("data/world.png", TileSize)
 var worldTileSpriteMap = make(map[byte]*ebiten.Image)
 
+var collidable = map[byte]bool{
+	'0': true,
+	'1': true,
+	'B': true,
+}
+
 func init() {
 	for k, v := range map[byte]int{
 		'0': 0,
+		'1': 1,
+		'B': 3,
 		'L': 2,
 		'H': 4,
+		'.': 8,
 	} {
 		worldTileSpriteMap[k] = worldSprites[v]
 	}
@@ -54,7 +63,7 @@ func (w *World) Load(path string, spawn func(byte, float64, float64)) {
 
 func (w *World) TileAt(x, y int) byte {
 	if y < 0 || y >= len(w.tiles) || x < 0 || x >= len(w.tiles[y]) {
-		return '0'
+		return '1'
 	}
 	return w.tiles[y][x]
 }
@@ -72,7 +81,7 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 			t := w.TileAt(x, y)
 
 			// ignore background tile
-			if t != '0' {
+			if !collidable[t] {
 				continue
 			}
 

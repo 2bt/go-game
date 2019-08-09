@@ -13,9 +13,7 @@ const (
 )
 
 func update(screen *ebiten.Image) error {
-	if err := game.Update(); err != nil {
-		return err
-	}
+	game.Update()
 
 	// toggle fullscreen
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {

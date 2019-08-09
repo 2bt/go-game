@@ -21,11 +21,9 @@ func NewGame() (*Game, error) {
 	return g, nil
 }
 
-func (g *Game) Update() error {
+func (g *Game) Update() {
 	g.hero.Update(getInput())
 	g.bullets.Update()
-
-	return nil
 }
 
 func (g *Game) AddBullet(b *Bullet) {
