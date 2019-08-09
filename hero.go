@@ -11,6 +11,7 @@ import (
 var heroIdleSprites = LoadSprites("data/hero-idle.png", 0)
 var heroRunSprites = LoadSprites("data/hero-run.png", 0)
 var heroJumpSprites = LoadSprites("data/hero-jump.png", 0)
+var heroClimbSprites = LoadSprites("data/hero-climb.png", 0)
 
 type Hero struct {
 	x           float64
@@ -44,7 +45,8 @@ func (h *Hero) Update(input Input) {
 		m := math.Mod(h.x, TileSize)
 		h.x += Clamp(8-m, -0.5, 0.5)
 
-		h.y += float64(input.y)
+		h.vy = float64(input.y)
+		h.y += h.vy
 
 		dist := game.world.CheckCollision(AxisY, &Box{
 			h.x - 7, h.y - 19, 14, 19,
@@ -178,7 +180,12 @@ func (h *Hero) Draw(screen *ebiten.Image, cam *Box) {
 
 	var frame *ebiten.Image
 
-	if h.inAir {
+	if h.climbing {
+		frame = heroClimbSprites[0]
+		if h.vy != 0 {
+			frame = heroClimbSprites[h.tick/4%4]
+		}
+	} else if h.inAir {
 		f := 3
 		switch {
 		case h.vy < -4:
