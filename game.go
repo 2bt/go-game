@@ -5,20 +5,19 @@ import (
 )
 
 type Game struct {
-	world   *World
-	hero    *Hero
+	world   World
+	hero    Hero
 	bullets Entities
 }
 
 func NewGame() (*Game, error) {
-	g := &Game{
-		world: NewWorld("data/level-1.txt"),
-		hero: &Hero{
-			x:   ScreenWidth / 2,
-			y:   ScreenHeight / 2,
-			dir: 1,
-		},
-	}
+	g := &Game{}
+	g.world.Load("data/level-1.txt", func(t byte, x, y float64) {
+		switch t {
+		case '@':
+			g.hero = Hero{x: x, y: y}
+		}
+	})
 	return g, nil
 }
 
@@ -37,7 +36,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	cam := Box{
 		g.hero.x - ScreenWidth/2,
-		g.hero.y - ScreenHeight/2,
+		g.hero.y - ScreenHeight/2 - 30,
 		ScreenWidth,
 		ScreenHeight,
 	}

@@ -30,25 +30,26 @@ type World struct {
 	height int
 }
 
-func NewWorld(path string) *World {
+func (w *World) Load(path string, spawn func(byte, float64, float64)) {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
-		return nil
 	}
 	defer file.Close()
 
-	w := &World{}
 	s := bufio.NewScanner(file)
 	for s.Scan() {
 		w.tiles = append(w.tiles, s.Bytes())
-		w.height++
 		if len(s.Bytes()) > w.width {
 			w.width = len(s.Bytes())
 		}
-	}
 
-	return w
+		// spawn
+		for x, t := range w.tiles[w.height] {
+			spawn(t, float64(x*TileSize+TileSize/2), float64(w.height*TileSize+TileSize))
+		}
+		w.height++
+	}
 }
 
 func (w *World) TileAt(x, y int) byte {
@@ -71,7 +72,7 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 			t := w.TileAt(x, y)
 
 			// ignore background tile
-			if t == ' ' || t == 'L' {
+			if t != '0' {
 				continue
 			}
 
