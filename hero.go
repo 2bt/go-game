@@ -1,37 +1,33 @@
 package main
 
 import (
+	"image/color"
 	"math"
 
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 var heroIdleSprites = LoadSprites("data/hero-idle.png", 0)
 var heroRunSprites = LoadSprites("data/hero-run.png", 0)
 var heroJumpSprites = LoadSprites("data/hero-jump.png", 0)
 
-type Dir int
-
-const (
-	Right Dir = 0
-	Left  Dir = 1
-)
-
 type Hero struct {
 	x           float64
 	y           float64
 	vx          float64
 	vy          float64
+	dir         Dir
 	inAir       bool
 	jumpControl bool
 	oldJump     bool
-	dir         Dir
+	shootDelay  int
 	tick        int
 }
 
 const Gravity = 0.5
 const MaxSpeedX = 1.5
-const MaxSpeedY = 4
+const MaxSpeedY = 3
 
 func (h *Hero) Update(input Input) {
 
@@ -81,33 +77,35 @@ func (h *Hero) Update(input Input) {
 		h.inAir = true
 	}
 
-	jump := input.jump
-
 	if h.inAir {
 		// jump higher
 		if h.jumpControl {
-			if !jump && h.vy < -1 {
+			if !input.jump && h.vy < -1 {
 				h.vy = -1
 				h.jumpControl = false
 			}
-			if !jump || h.vy > -1 {
+			if !input.jump || h.vy > -1 {
 				h.jumpControl = false
 			}
 		}
 
 	} else {
 		// jump
-		if jump && !h.oldJump {
+		if input.jump && !h.oldJump {
 			h.inAir = true
 			h.jumpControl = true
-			h.vy = -7
+			h.vy = -9
 		}
 	}
-	h.oldJump = jump
+	h.oldJump = input.jump
 
 	// fire a bullet
-	if input.shoot {
-		game.AddBullet(h.x, h.y, h.dir)
+	if input.shoot && h.shootDelay <= 0 {
+		game.AddBullet(&Bullet{h.x, h.y - 11, h.dir})
+		h.shootDelay = 10
+	}
+	if h.shootDelay > 0 {
+		h.shootDelay--
 	}
 
 	h.tick++
@@ -143,4 +141,36 @@ func (h *Hero) Draw(screen *ebiten.Image) {
 	screen.DrawImage(frame, &o)
 
 	// ebitenutil.DrawRect(screen, h.x-7, h.y-19, 14, 19, color.RGBA{100, 0, 0, 100})
+}
+
+type Bullet struct {
+	x   float64
+	y   float64
+	dir Dir
+}
+
+func (b *Bullet) Update() bool {
+	// set new pos
+	if b.dir == Right {
+		b.x += 8
+	} else {
+		b.x -= 8
+	}
+
+	dist := game.world.CheckCollision(AxisY, &Box{b.x - 4, b.y - 1, 8, 2})
+	if dist != 0 {
+		return false
+	}
+
+	return true
+}
+
+func (h *Bullet) Draw(screen *ebiten.Image) {
+	o := ebiten.DrawImageOptions{}
+	o.GeoM.Translate(-16, -24)
+	if h.dir == Left {
+		o.GeoM.Scale(-1, 1)
+	}
+	o.GeoM.Translate(h.x, h.y)
+	ebitenutil.DrawRect(screen, h.x-4, h.y-1, 8, 2, color.RGBA{255, 255, 255, 255})
 }

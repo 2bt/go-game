@@ -9,6 +9,13 @@ import (
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
+type Dir int
+
+const (
+	Right Dir = 0
+	Left  Dir = 1
+)
+
 type Box struct {
 	X float64
 	Y float64
@@ -48,6 +55,7 @@ func LoadSprites(path string, size int) []*ebiten.Image {
 	return sprites
 }
 
+// returns overlap. 0 means no collision
 func (a *Box) CheckCollision(axis Axis, b *Box) float64 {
 	if a.X >= b.X+b.W || a.Y >= b.Y+b.H || a.X+a.W <= b.X || a.Y+a.H <= b.Y {
 		return 0

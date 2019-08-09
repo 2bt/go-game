@@ -26,7 +26,7 @@ func getInput() Input {
 		input.x++
 	}
 	input.jump = ebiten.IsKeyPressed(ebiten.KeyX) || ebiten.IsKeyPressed(ebiten.KeySpace)
-	input.shoot = ebiten.IsKeyPressed(ebiten.KeyW)
+	input.shoot = ebiten.IsKeyPressed(ebiten.KeyC)
 
 	return input
 }

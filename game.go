@@ -2,8 +2,6 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
-	"image/color"
 )
 
 type Game struct {
@@ -26,19 +24,20 @@ func NewGame() (*Game, error) {
 
 func (g *Game) Update() error {
 	g.hero.Update(getInput())
+
+	i := 0
 	for _, b := range g.bullets {
-		b.Update()
+		if b.Update() {
+			g.bullets[i] = b
+			i++
+		}
 	}
+	g.bullets = g.bullets[:i]
+
 	return nil
 }
 
-func (g *Game) AddBullet(x float64, y float64, dir Dir) {
-	b := &Bullet{
-		x,
-		y,
-		dir,
-	}
-
+func (g *Game) AddBullet(b *Bullet) {
 	g.bullets = append(g.bullets, b)
 }
 
@@ -52,28 +51,3 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 var game *Game
-
-type Bullet struct {
-	x   float64
-	y   float64
-	dir Dir
-}
-
-func (b *Bullet) Update() {
-	// set new pos
-	if b.dir == Right {
-		b.x += 2.5
-	} else {
-		b.x -= 2.5
-	}
-}
-
-func (h *Bullet) Draw(screen *ebiten.Image) {
-	o := ebiten.DrawImageOptions{}
-	o.GeoM.Translate(-16, -24)
-	if h.dir == Left {
-		o.GeoM.Scale(-1, 1)
-	}
-	o.GeoM.Translate(h.x, h.y)
-	ebitenutil.DrawRect(screen, h.x-7, h.y-19, 14, 19, color.RGBA{100, 0, 0, 100})
-}
