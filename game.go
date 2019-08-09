@@ -14,8 +14,8 @@ func NewGame() (*Game, error) {
 	g := &Game{
 		world: NewWorld("data/level-1.txt"),
 		hero: &Hero{
-			x:   screenWidth / 2,
-			y:   screenHeight / 2,
+			x:   ScreenWidth / 2,
+			y:   ScreenHeight / 2,
 			dir: 1,
 		},
 	}
@@ -34,9 +34,17 @@ func (g *Game) AddBullet(b *Bullet) {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.world.Draw(screen)
-	g.hero.Draw(screen)
-	g.bullets.Draw(screen)
+
+	cam := Box{
+		g.hero.x - ScreenWidth/2,
+		g.hero.y - ScreenHeight/2,
+		ScreenWidth,
+		ScreenHeight,
+	}
+
+	g.world.Draw(screen, &cam)
+	g.hero.Draw(screen, &cam)
+	g.bullets.Draw(screen, &cam)
 	// ebitenutil.DebugPrint(screen, "Hello, World!")
 }
 

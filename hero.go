@@ -111,12 +111,13 @@ func (h *Hero) Update(input Input) {
 	h.tick++
 }
 
-func (h *Hero) Draw(screen *ebiten.Image) {
+func (h *Hero) Draw(screen *ebiten.Image, cam *Box) {
 	o := ebiten.DrawImageOptions{}
 	o.GeoM.Translate(-16, -24)
 	if h.dir == Left {
 		o.GeoM.Scale(-1, 1)
 	}
+	o.GeoM.Translate(-cam.X, -cam.Y)
 	o.GeoM.Translate(h.x, h.y)
 
 	var frame *ebiten.Image
@@ -165,12 +166,6 @@ func (b *Bullet) Update() bool {
 	return true
 }
 
-func (h *Bullet) Draw(screen *ebiten.Image) {
-	o := ebiten.DrawImageOptions{}
-	o.GeoM.Translate(-16, -24)
-	if h.dir == Left {
-		o.GeoM.Scale(-1, 1)
-	}
-	o.GeoM.Translate(h.x, h.y)
-	ebitenutil.DrawRect(screen, h.x-4, h.y-1, 8, 2, color.RGBA{255, 255, 255, 255})
+func (h *Bullet) Draw(screen *ebiten.Image, cam *Box) {
+	ebitenutil.DrawRect(screen, h.x-4-cam.X, h.y-1-cam.Y, 8, 2, color.RGBA{255, 255, 255, 255})
 }

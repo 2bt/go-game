@@ -53,7 +53,7 @@ func NewWorld(path string) *World {
 
 func (w *World) TileAt(x, y int) byte {
 	if y < 0 || y >= len(w.tiles) || x < 0 || x >= len(w.tiles[y]) {
-		return ' '
+		return '0'
 	}
 	return w.tiles[y][x]
 }
@@ -91,17 +91,24 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 	return dist
 }
 
-func (w *World) Draw(screen *ebiten.Image) {
+func (w *World) Draw(screen *ebiten.Image, cam *Box) {
+
+	x1 := int(math.Floor(cam.X / TileSize))
+	x2 := int(math.Floor((cam.X + cam.W) / TileSize))
+	y1 := int(math.Floor(cam.Y / TileSize))
+	y2 := int(math.Floor((cam.Y + cam.H) / TileSize))
+
 	o := ebiten.DrawImageOptions{}
-	for y := 0; y < w.height; y++ {
-		for x := 0; x < w.width; x++ {
+	for y := y1; y <= y2; y++ {
+		for x := x1; x <= x2; x++ {
 			t := w.TileAt(x, y)
+
 			img, ok := worldTileSpriteMap[t]
 			if !ok {
 				continue
 			}
 			o.GeoM.Reset()
-			o.GeoM.Translate(float64(x*TileSize), float64(y*TileSize))
+			o.GeoM.Translate(float64(x*TileSize)-cam.X, float64(y*TileSize)-cam.Y)
 			screen.DrawImage(img, &o)
 		}
 	}
