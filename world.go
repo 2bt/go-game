@@ -11,13 +11,14 @@ import (
 
 const TileSize = 16
 
-var worldSprites = LoadSprites("data/world.png", TileSize)
+var worldSprites = append(LoadSprites("data/world.png", TileSize), mobRobotIdle...)
 var worldTileSpriteMap = make(map[byte]*ebiten.Image)
 
 var collidable = map[byte]bool{
 	'0': true,
 	'1': true,
 	'B': true,
+	'M': true,
 }
 
 func init() {
@@ -28,6 +29,7 @@ func init() {
 		'L': 2,
 		'H': 4,
 		'.': 8,
+		'M': 9,
 	} {
 		worldTileSpriteMap[k] = worldSprites[v]
 	}
@@ -37,6 +39,7 @@ type World struct {
 	tiles  [][]byte
 	width  int
 	height int
+	mobs   Entities
 }
 
 func (w *World) Load(path string, spawn func(byte, float64, float64)) {

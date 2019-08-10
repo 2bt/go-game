@@ -25,6 +25,7 @@ type Hero struct {
 	oldJump     bool
 	shootDelay  int
 	tick        int
+	Life        *Life
 }
 
 const Gravity = 0.5
@@ -166,10 +167,12 @@ func (h *Hero) Update(input Input) {
 		h.shootDelay--
 	}
 
+	h.Life.x, h.Life.y = h.x, h.y
 	h.tick++
 }
 
 func (h *Hero) Draw(screen *ebiten.Image, cam *Box) {
+	h.Life.Draw(screen, cam)
 	o := ebiten.DrawImageOptions{}
 	o.GeoM.Translate(-16, -24)
 	if h.dir == Left {
