@@ -13,11 +13,14 @@ type Life struct {
 	ownerSize float64
 	damage    uint
 	width     float64
+	alive     bool
+	xOffset   float64
+	yOffset   float64
 }
 
 func (h *Life) Update(x, y float64) bool {
-	h.x = x
-	h.y = y - h.ownerSize
+	h.x = x - h.xOffset
+	h.y = y - h.yOffset
 
 	h.width = 10
 
@@ -27,8 +30,10 @@ func (h *Life) Update(x, y float64) bool {
 
 	if h.damage > 0 && h.hp > 0 {
 		//reduce the health bar width by the same percentage the health was reduced
-		h.width = float64(h.damage) / float64(h.hp) * h.width
+		h.width -= float64(h.damage) / float64(h.hp) * h.width
 	}
+
+	h.alive = !(h.damage >= h.hp)
 	return true
 }
 

@@ -7,6 +7,7 @@ import (
 )
 
 var mobRobotIdle = LoadSprites("data/mob-robot-idle.png", 0)
+var mobRobotDie = LoadSprites("data/mob-robot-die1.png", 0)
 
 type Mob struct {
 	box  Box
@@ -23,16 +24,13 @@ func NewMob(x, y float64) *Mob {
 			W: 16,
 			H: 24,
 		},
-		Life: &Life{hp: 20, x: x, y: y, ownerSize: 50},
+		Life: &Life{hp: 20, x: x + 100, y: y, ownerSize: 70, alive: true, xOffset: 10},
 	}
 }
 
-func (m *Mob) Box() Box { return m.box }
-
-func (m *Mob) TakeDamage(dmg uint) {
-	println("taken damage")
-	m.Life.damage += dmg
-}
+func (m *Mob) ToRemove() bool      { return !m.Life.alive }
+func (m *Mob) Box() Box            { return m.box }
+func (m *Mob) TakeDamage(dmg uint) { m.Life.damage += dmg }
 
 func (m *Mob) Update() bool {
 	if time.Now().Unix()%2 == 0 {
@@ -55,7 +53,16 @@ func (h *Mob) Draw(screen *ebiten.Image, cam *Box) {
 	o.GeoM.Translate(-cam.X, -cam.Y)
 	o.GeoM.Translate(h.box.X, h.box.Y)
 
-	_ = screen.DrawImage(mobRobotIdle[h.tick/4%8], &o)
+	if h.Life.alive {
+		_ = screen.DrawImage(mobRobotIdle[h.tick/4%8], &o)
+		return
+	}
+	//todo
+	// how to change these frames slower
+	// at the moment cannot see the whole animation
+	for _, frame := range mobRobotDie {
+		_ = screen.DrawImage(frame, &o)
+	}
 
 	// // rect for debugging
 	// ebitenutil.DrawRect(

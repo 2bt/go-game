@@ -8,21 +8,24 @@ import (
 )
 
 type Bullet struct {
-	box Box
-	dir Dir
-	dmg uint
+	box    Box
+	dir    Dir
+	dmg    uint
+	inside bool
 }
 
 func NewBullet(x, y float64, dir Dir) *Bullet {
 	return &Bullet{
 		Box{x - 4, y - 1, 8, 2},
-		dir, 3,
+		dir, 3, false,
 	}
 }
 
 type TakeDamage interface {
 	TakeDamage(dmg uint)
 }
+
+func (b *Bullet) ToRemove() bool { return b.inside }
 
 func (b *Bullet) Hit(e Entity) {
 	d, ok := e.(TakeDamage)
@@ -50,9 +53,13 @@ func (b *Bullet) Update() bool {
 
 	// collision with mobs
 	for _, m := range game.world.mobs {
+		if b.inside {
+			continue
+		}
 		mb := m.Box()
 		dist := b.box.CheckCollision(AxisY, &mb)
 		if dist != 0 {
+			b.inside = true
 			b.Hit(m)
 		}
 	}
