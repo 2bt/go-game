@@ -18,7 +18,6 @@ var collidable = map[byte]bool{
 	'0': true,
 	'1': true,
 	'B': true,
-	'M': true,
 }
 
 func init() {
@@ -29,7 +28,6 @@ func init() {
 		'L': 2,
 		'H': 4,
 		'.': 8,
-		'M': 9,
 	} {
 		worldTileSpriteMap[k] = worldSprites[v]
 	}

@@ -158,7 +158,7 @@ func (h *Hero) Update(input Input) {
 
 	// fire a bullet
 	if input.shoot && h.shootDelay <= 0 {
-		game.AddBullet(&Bullet{&Box{h.x, h.y - 11, 8, 2}, h.dir, 3})
+		game.AddBullet(NewBullet(h.x, h.y-11, h.dir))
 		h.shootDelay = 10
 	}
 	if h.shootDelay > 0 {

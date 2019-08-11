@@ -17,12 +17,7 @@ func NewGame() (*Game, error) {
 		case '@':
 			g.hero = Hero{x: x, y: y, Life: &Life{hp: 100, x: x, y: y, ownerSize: 20}}
 		case 'M':
-			g.world.mobs = append(g.world.mobs, &Mob{box: &Box{
-				X: x,
-				Y: y,
-				W: 0,
-				H: 0,
-			}, Life: &Life{hp: 20, x: x, y: y, ownerSize: 50}})
+			g.world.mobs = append(g.world.mobs, NewMob(x, y))
 		}
 	})
 	return &g, nil

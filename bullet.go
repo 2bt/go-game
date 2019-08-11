@@ -1,15 +1,23 @@
 package main
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
-	"image/color"
 )
 
 type Bullet struct {
-	box *Box
+	box Box
 	dir Dir
 	dmg uint
+}
+
+func NewBullet(x, y float64, dir Dir) *Bullet {
+	return &Bullet{
+		Box{x - 4, y - 1, 8, 2},
+		dir, 3,
+	}
 }
 
 type TakeDamage interface {
@@ -23,19 +31,9 @@ func (b *Bullet) Hit(e Entity) {
 	}
 }
 
-func (b *Bullet) Box() Box { return *b.box }
+func (b *Bullet) Box() Box { return b.box }
 
 func (b *Bullet) Update() bool {
-	bb := b.Box()
-	bb.Y += 40
-	for _, m := range game.world.mobs {
-		mb := m.Box()
-		dist := bb.CheckCollision(AxisY, &mb) + bb.CheckCollision(AxisX, &mb)
-
-		if dist != 0 {
-			b.Hit(m)
-		}
-	}
 
 	// set new pos
 	if b.dir == Right {
@@ -44,9 +42,19 @@ func (b *Bullet) Update() bool {
 		b.box.X -= 8
 	}
 
-	dist := game.world.CheckCollision(AxisY, &Box{b.box.X - 4, b.box.Y - 1, b.box.W, b.box.H})
+	// collision with world
+	dist := game.world.CheckCollision(AxisY, &b.box)
 	if dist != 0 {
 		return false
+	}
+
+	// collision with mobs
+	for _, m := range game.world.mobs {
+		mb := m.Box()
+		dist := b.box.CheckCollision(AxisY, &mb)
+		if dist != 0 {
+			b.Hit(m)
+		}
 	}
 
 	return true
@@ -55,12 +63,11 @@ func (b *Bullet) Update() bool {
 func (h *Bullet) Draw(screen *ebiten.Image, cam *Box) {
 	ebitenutil.DrawRect(
 		screen,
-		h.box.X-4-cam.X,
-		h.box.Y-1-cam.Y,
+		h.box.X-cam.X,
+		h.box.Y-cam.Y,
 		h.box.W,
 		h.box.H,
 		color.RGBA{
 			255, 255, 255, 255,
 		})
 }
-
