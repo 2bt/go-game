@@ -15,13 +15,14 @@ func NewGame() (*Game, error) {
 	g.world.Load("data/level-1.txt", func(t byte, x, y float64) {
 		switch t {
 		case '@':
-			g.hero = Hero{x: x, y: y, Life: &Life{100, x, y}}
+			g.hero = Hero{x: x, y: y, Life: &Life{hp: 100, x: x, y: y, ownerSize: 20}}
 		case 'M':
-			g.world.mobs = append(g.world.mobs, &Mob{x: x, y: y, Life: &Life{
-				hp: 20,
-				x:  x,
-				y:  y,
-			}})
+			g.world.mobs = append(g.world.mobs, &Mob{box: &Box{
+				X: x,
+				Y: y,
+				W: 0,
+				H: 0,
+			}, Life: &Life{hp: 20, x: x, y: y, ownerSize: 50}})
 		}
 	})
 	return &g, nil

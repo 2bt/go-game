@@ -1,11 +1,9 @@
 package main
 
 import (
-	"image/color"
 	"math"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 var heroIdleSprites = LoadSprites("data/hero-idle.png", 0)
@@ -160,14 +158,14 @@ func (h *Hero) Update(input Input) {
 
 	// fire a bullet
 	if input.shoot && h.shootDelay <= 0 {
-		game.AddBullet(&Bullet{h.x, h.y - 11, h.dir})
+		game.AddBullet(&Bullet{&Box{h.x, h.y - 11, 8, 2}, h.dir, 3})
 		h.shootDelay = 10
 	}
 	if h.shootDelay > 0 {
 		h.shootDelay--
 	}
 
-	h.Life.x, h.Life.y = h.x, h.y
+	h.Life.Update(h.x-3, h.y-2)
 	h.tick++
 }
 
@@ -208,30 +206,4 @@ func (h *Hero) Draw(screen *ebiten.Image, cam *Box) {
 	screen.DrawImage(frame, &o)
 
 	// ebitenutil.DrawRect(screen, h.x-7, h.y-19, 14, 19, color.RGBA{100, 0, 0, 100})
-}
-
-type Bullet struct {
-	x   float64
-	y   float64
-	dir Dir
-}
-
-func (b *Bullet) Update() bool {
-	// set new pos
-	if b.dir == Right {
-		b.x += 8
-	} else {
-		b.x -= 8
-	}
-
-	dist := game.world.CheckCollision(AxisY, &Box{b.x - 4, b.y - 1, 8, 2})
-	if dist != 0 {
-		return false
-	}
-
-	return true
-}
-
-func (h *Bullet) Draw(screen *ebiten.Image, cam *Box) {
-	ebitenutil.DrawRect(screen, h.x-4-cam.X, h.y-1-cam.Y, 8, 2, color.RGBA{255, 255, 255, 255})
 }

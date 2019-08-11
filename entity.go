@@ -5,6 +5,7 @@ import "github.com/hajimehoshi/ebiten"
 type Entity interface {
 	Update() bool
 	Draw(screen *ebiten.Image, cam *Box)
+	Box() Box
 }
 
 type Entities []Entity
