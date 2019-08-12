@@ -1,7 +1,7 @@
 package main
 
 import (
-	"time"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -10,12 +10,13 @@ var mobRobotIdle = LoadSprites("data/mob-robot-idle.png", 0)
 var mobRobotDie = LoadSprites("data/mob-robot-die1.png", 0)
 
 type Mob struct {
-	box       Box
-	Life      *Life
-	dir       Dir
-	tick      int
-	deathAnim bool
-	deathTick int
+	box         Box
+	Life        *Life
+	vx          float64
+	walkCounter int
+	tick        int
+	deathAnim   bool
+	deathTick   int
 }
 
 func NewMob(x, y float64) *Mob {
@@ -27,7 +28,9 @@ func NewMob(x, y float64) *Mob {
 			H:          24,
 			collidable: true,
 		},
-		Life: &Life{hp: 20, x: x + 100, y: y, ownerSize: 70, alive: true, xOffset: 10},
+		Life:        &Life{hp: 20, x: x + 100, y: y, ownerSize: 70, alive: true, xOffset: 10},
+		walkCounter: rand.Intn(90),
+		vx:          1,
 	}
 }
 
@@ -36,13 +39,13 @@ func (m *Mob) Box() Box            { return m.box }
 func (m *Mob) TakeDamage(dmg uint) { m.Life.damage += dmg }
 
 func (m *Mob) Update() bool {
-	if time.Now().Unix()%2 == 0 {
-		m.dir = Left
-		m.box.X -= 1
+	if m.walkCounter > 0 {
+		m.walkCounter--
 	} else {
-		m.dir = Right
-		m.box.X += 1
+		m.walkCounter = 90 + rand.Intn(30)
+		m.vx *= -1
 	}
+	m.box.X += m.vx
 
 	m.Life.Update(m.box.X+8, m.box.Y-6)
 	m.tick++
