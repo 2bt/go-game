@@ -92,6 +92,7 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 				float64(y * TileSize),
 				TileSize,
 				TileSize,
+				false,
 			})
 			if math.Abs(d) > math.Abs(dist) {
 				dist = d

@@ -16,7 +16,7 @@ type Bullet struct {
 
 func NewBullet(x, y float64, dir Dir) *Bullet {
 	return &Bullet{
-		Box{x - 4, y - 1, 8, 2},
+		Box{x - 4, y - 1, 8, 2, true},
 		dir, 3, false,
 	}
 }
@@ -53,10 +53,10 @@ func (b *Bullet) Update() bool {
 
 	// collision with mobs
 	for _, m := range game.world.mobs {
-		if b.inside {
+		mb := m.Box()
+		if b.inside || !mb.Collidable() {
 			continue
 		}
-		mb := m.Box()
 		dist := b.box.CheckCollision(AxisY, &mb)
 		if dist != 0 {
 			b.inside = true

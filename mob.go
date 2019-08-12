@@ -10,25 +10,28 @@ var mobRobotIdle = LoadSprites("data/mob-robot-idle.png", 0)
 var mobRobotDie = LoadSprites("data/mob-robot-die1.png", 0)
 
 type Mob struct {
-	box  Box
-	Life *Life
-	dir  Dir
-	tick int
+	box       Box
+	Life      *Life
+	dir       Dir
+	tick      int
+	deathAnim bool
+	deathTick int
 }
 
 func NewMob(x, y float64) *Mob {
 	return &Mob{
 		box: Box{
-			X: x - 8,
-			Y: y - 24,
-			W: 16,
-			H: 24,
+			X:          x - 8,
+			Y:          y - 24,
+			W:          16,
+			H:          24,
+			collidable: true,
 		},
 		Life: &Life{hp: 20, x: x + 100, y: y, ownerSize: 70, alive: true, xOffset: 10},
 	}
 }
 
-func (m *Mob) ToRemove() bool      { return !m.Life.alive }
+func (m *Mob) ToRemove() bool      { return !m.Life.alive && !m.deathAnim }
 func (m *Mob) Box() Box            { return m.box }
 func (m *Mob) TakeDamage(dmg uint) { m.Life.damage += dmg }
 
@@ -43,9 +46,21 @@ func (m *Mob) Update() bool {
 
 	m.Life.Update(m.box.X+8, m.box.Y-6)
 	m.tick++
+
+	if !m.deathAnim {
+		m.deathAnim = !m.Life.alive
+	}
+	if m.deathAnim {
+		m.box.collidable = false
+		m.deathTick++
+	}
 	return true
 }
 
+//todo lore idea
+// save the princess/prisoner but she turns into a prophet
+//  use the socrates bridge paradox
+// https://en.wikipedia.org/wiki/Buridan%27s_bridge
 func (h *Mob) Draw(screen *ebiten.Image, cam *Box) {
 	h.Life.Draw(screen, cam)
 	o := ebiten.DrawImageOptions{}
@@ -57,12 +72,14 @@ func (h *Mob) Draw(screen *ebiten.Image, cam *Box) {
 		_ = screen.DrawImage(mobRobotIdle[h.tick/4%8], &o)
 		return
 	}
-	//todo
-	// how to change these frames slower
-	// at the moment cannot see the whole animation
-	for _, frame := range mobRobotDie {
-		_ = screen.DrawImage(frame, &o)
+
+	if h.deathTick >= 176 {
+		h.deathTick = 0
+		h.deathAnim = false
+		return
 	}
+
+	_ = screen.DrawImage(mobRobotDie[h.deathTick], &o)
 
 	// // rect for debugging
 	// ebitenutil.DrawRect(

@@ -38,5 +38,7 @@ func (h *Life) Update(x, y float64) bool {
 }
 
 func (h *Life) Draw(screen *ebiten.Image, cam *Box) {
-	ebitenutil.DrawRect(screen, h.x-1-cam.X, h.y-1-cam.Y, h.width, 2, color.RGBA{255, 0, 0, 200})
+	if h.alive {
+		ebitenutil.DrawRect(screen, h.x-1-cam.X, h.y-1-cam.Y, h.width, 2, color.RGBA{255, 0, 0, 200})
+	}
 }

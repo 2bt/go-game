@@ -40,6 +40,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.hero.y - ScreenHeight/2 - 30,
 		ScreenWidth,
 		ScreenHeight,
+		false,
 	}
 
 	g.world.Draw(screen, cam)

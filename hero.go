@@ -48,7 +48,7 @@ func (h *Hero) Update(input Input) {
 		h.y += h.vy
 
 		dist := game.world.CheckCollision(AxisY, &Box{
-			h.x - 7, h.y - 19, 14, 19,
+			h.x - 7, h.y - 19, 14, 19, false,
 		})
 		if dist != 0 {
 			h.y += dist
@@ -94,7 +94,7 @@ func (h *Hero) Update(input Input) {
 		h.x += h.vx
 
 		dist := game.world.CheckCollision(AxisX, &Box{
-			h.x - 7, h.y - 19, 14, 19,
+			h.x - 7, h.y - 19, 14, 19, false,
 		})
 		if dist != 0 {
 			h.x += dist
@@ -105,7 +105,7 @@ func (h *Hero) Update(input Input) {
 		h.y += Clamp(h.vy, -MaxSpeedY, MaxSpeedY)
 
 		dist = game.world.CheckCollision(AxisY, &Box{
-			h.x - 7, h.y - 19, 14, 19,
+			h.x - 7, h.y - 19, 14, 19, false,
 		})
 		if dist != 0 {
 			h.y += dist

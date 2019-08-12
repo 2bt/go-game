@@ -17,11 +17,14 @@ const (
 )
 
 type Box struct {
-	X float64
-	Y float64
-	W float64
-	H float64
+	X          float64
+	Y          float64
+	W          float64
+	H          float64
+	collidable bool
 }
+
+func (b *Box) Collidable() bool { return b.collidable }
 
 type Axis int
 
