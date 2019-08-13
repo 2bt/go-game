@@ -96,9 +96,9 @@ type SparkParticle struct {
 func NewSparkParticle(x, y float64) *SparkParticle {
 	return &SparkParticle{
 		box:  Box{x - 1, y - 1, 2, 2},
-		vx:   (rand.Float64() - 0.5) * 5,
-		vy:   (rand.Float64() - 0.5) * 5,
-		tick: rand.Intn(20) + 5,
+		vx:   (rand.Float64() - 0.5) * 7,
+		vy:   (rand.Float64() - 0.5) * 7,
+		tick: rand.Intn(25),
 	}
 }
 
@@ -108,18 +108,22 @@ func (p *SparkParticle) Update() {
 	dist := game.world.CheckCollision(AxisX, &p.box)
 	if dist != 0 {
 		p.box.X += dist
-		p.vx *= 1
+		p.vx *= -0.5
 	}
 	p.vy += Gravity
 	p.box.Y += Clamp(p.vy, -MaxSpeedY, MaxSpeedY)
 	dist = game.world.CheckCollision(AxisY, &p.box)
 	if dist != 0 {
 		p.box.Y += dist
-		p.vy *= 1
+		p.vy *= -0.5
 	}
 
 }
 func (p *SparkParticle) Draw(screen *ebiten.Image, cam *Box) {
+	a := p.tick * 10
+	if a > 255 {
+		a = 255
+	}
 	ebitenutil.DrawRect(
 		screen,
 		p.box.X-cam.X,
@@ -127,7 +131,7 @@ func (p *SparkParticle) Draw(screen *ebiten.Image, cam *Box) {
 		p.box.W,
 		p.box.H,
 		color.RGBA{
-			255, 255, 255, 100,
+			255, 255, 255, uint8(a),
 		})
 }
 func (p *SparkParticle) Box() Box { return Box{} }
