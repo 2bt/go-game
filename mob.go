@@ -88,10 +88,10 @@ func (p *MobDeathParticle) Draw(screen *ebiten.Image, cam *Box) {
 	o.GeoM.Translate(-32+8, -44+24)
 	o.GeoM.Translate(-cam.X, -cam.Y)
 	o.GeoM.Translate(p.x, p.y)
-	_ = screen.DrawImage(mobRobotDie[p.tick], &o)
+	_ = screen.DrawImage(mobRobotDie[p.tick/2], &o)
 }
 func (p *MobDeathParticle) Box() Box { return Box{} }
 func (p *MobDeathParticle) Alive() bool {
-	return p.tick < 176
+	return p.tick < 44
 
 }

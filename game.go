@@ -49,8 +49,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		ScreenHeight,
 	}
 
-	g.particles.Draw(screen, cam)
 	g.world.Draw(screen, cam)
+	g.particles.Draw(screen, cam)
 	g.bullets.Draw(screen, cam)
 	g.hero.Draw(screen, cam)
 	g.mobs.Draw(screen, cam)
