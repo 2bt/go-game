@@ -23,12 +23,20 @@ type Hero struct {
 	oldJump     bool
 	shootDelay  int
 	tick        int
-	Life        *Life
+	life        *Life
 }
 
 const Gravity = 0.5
 const MaxSpeedX = 1.5
 const MaxSpeedY = 3
+
+func NewHero(x, y float64) *Hero {
+	return &Hero{
+		x:    x,
+		y:    y,
+		life: &Life{hp: 100, x: x, y: y, ownerSize: 35, xOffset: 1, yOffset: 20},
+	}
+}
 
 func (h *Hero) Update(input Input) {
 
@@ -48,7 +56,7 @@ func (h *Hero) Update(input Input) {
 		h.y += h.vy
 
 		dist := game.world.CheckCollision(AxisY, &Box{
-			h.x - 7, h.y - 19, 14, 19, false,
+			h.x - 7, h.y - 19, 14, 19,
 		})
 		if dist != 0 {
 			h.y += dist
@@ -94,7 +102,7 @@ func (h *Hero) Update(input Input) {
 		h.x += h.vx
 
 		dist := game.world.CheckCollision(AxisX, &Box{
-			h.x - 7, h.y - 19, 14, 19, false,
+			h.x - 7, h.y - 19, 14, 19,
 		})
 		if dist != 0 {
 			h.x += dist
@@ -105,7 +113,7 @@ func (h *Hero) Update(input Input) {
 		h.y += Clamp(h.vy, -MaxSpeedY, MaxSpeedY)
 
 		dist = game.world.CheckCollision(AxisY, &Box{
-			h.x - 7, h.y - 19, 14, 19, false,
+			h.x - 7, h.y - 19, 14, 19,
 		})
 		if dist != 0 {
 			h.y += dist
@@ -165,12 +173,12 @@ func (h *Hero) Update(input Input) {
 		h.shootDelay--
 	}
 
-	h.Life.Update(h.x-3, h.y-2)
+	h.life.Update(h.x-3, h.y-2)
 	h.tick++
 }
 
 func (h *Hero) Draw(screen *ebiten.Image, cam *Box) {
-	h.Life.Draw(screen, cam)
+	h.life.Draw(screen, cam)
 	o := ebiten.DrawImageOptions{}
 	o.GeoM.Translate(-16, -24)
 	if h.dir == Left {

@@ -5,9 +5,11 @@ import (
 )
 
 type Game struct {
-	world   World
-	hero    Hero
-	bullets Entities
+	world     World
+	hero      *Hero
+	bullets   Entities
+	mobs      Entities
+	particles Entities
 }
 
 func NewGame() (*Game, error) {
@@ -15,9 +17,9 @@ func NewGame() (*Game, error) {
 	g.world.Load("data/level-1.txt", func(t byte, x, y float64) {
 		switch t {
 		case '@':
-			g.hero = Hero{x: x, y: y, Life: &Life{hp: 100, x: x, y: y, ownerSize: 35, xOffset: 1, yOffset: 20}}
+			g.hero = NewHero(x, y)
 		case 'M':
-			g.world.mobs = append(g.world.mobs, NewMob(x, y))
+			g.mobs = append(g.mobs, NewMob(x, y))
 		}
 	})
 	return &g, nil
@@ -26,7 +28,8 @@ func NewGame() (*Game, error) {
 func (g *Game) Update() {
 	g.hero.Update(getInput())
 	g.bullets.Update()
-	g.world.mobs.Update()
+	g.particles.Update()
+	g.mobs.Update()
 }
 
 func (g *Game) AddBullet(b *Bullet) {
@@ -40,13 +43,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.hero.y - ScreenHeight/2 - 30,
 		ScreenWidth,
 		ScreenHeight,
-		false,
 	}
 
 	g.world.Draw(screen, cam)
-	g.hero.Draw(screen, cam)
+	g.particles.Draw(screen, cam)
 	g.bullets.Draw(screen, cam)
-	g.world.mobs.Draw(screen, cam)
+	g.hero.Draw(screen, cam)
+	g.mobs.Draw(screen, cam)
 }
 
 var game *Game

@@ -37,7 +37,6 @@ type World struct {
 	tiles  [][]byte
 	width  int
 	height int
-	mobs   Entities
 }
 
 func (w *World) Load(path string, spawn func(byte, float64, float64)) {
@@ -92,7 +91,6 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 				float64(y * TileSize),
 				TileSize,
 				TileSize,
-				false,
 			})
 			if math.Abs(d) > math.Abs(dist) {
 				dist = d

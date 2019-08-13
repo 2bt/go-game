@@ -3,10 +3,10 @@ package main
 import "github.com/hajimehoshi/ebiten"
 
 type Entity interface {
-	Update() bool
+	Update()
 	Draw(screen *ebiten.Image, cam *Box)
 	Box() Box
-	ToRemove() bool
+	Alive() bool
 }
 
 type Entities []Entity
@@ -14,7 +14,10 @@ type Entities []Entity
 func (es *Entities) Update() {
 	i := 0
 	for _, e := range *es {
-		if e.Update() {
+		if e.Alive() {
+			e.Update()
+		}
+		if e.Alive() {
 			(*es)[i] = e
 			i++
 		}
@@ -26,13 +29,4 @@ func (es *Entities) Draw(screen *ebiten.Image, cam *Box) {
 	for _, e := range *es {
 		e.Draw(screen, cam)
 	}
-	clean := make(Entities, 0)
-
-	for _, e := range *es {
-		if e.ToRemove() {
-			continue
-		}
-		clean = append(clean, e)
-	}
-	*es = clean
 }

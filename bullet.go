@@ -8,16 +8,19 @@ import (
 )
 
 type Bullet struct {
-	box    Box
-	dir    Dir
-	dmg    uint
-	inside bool
+	alive bool
+	box   Box
+	dir   Dir
+	dmg   uint
+	tick  int
 }
 
 func NewBullet(x, y float64, dir Dir) *Bullet {
 	return &Bullet{
-		Box{x - 4, y - 1, 8, 2, true},
-		dir, 3, false,
+		alive: true,
+		box:   Box{x - 4, y - 1, 8, 2},
+		dir:   dir,
+		dmg:   3,
 	}
 }
 
@@ -25,18 +28,12 @@ type TakeDamage interface {
 	TakeDamage(dmg uint)
 }
 
-func (b *Bullet) ToRemove() bool { return b.inside }
-
-func (b *Bullet) Hit(e Entity) {
-	d, ok := e.(TakeDamage)
-	if ok {
-		d.TakeDamage(b.dmg)
-	}
-}
+func (b *Bullet) Alive() bool { return b.alive && b.tick < 30 }
 
 func (b *Bullet) Box() Box { return b.box }
 
-func (b *Bullet) Update() bool {
+func (b *Bullet) Update() {
+	b.tick++
 
 	// set new pos
 	if b.dir == Right {
@@ -48,23 +45,26 @@ func (b *Bullet) Update() bool {
 	// collision with world
 	dist := game.world.CheckCollision(AxisY, &b.box)
 	if dist != 0 {
-		return false
+		b.alive = false
+		return
 	}
 
 	// collision with mobs
-	for _, m := range game.world.mobs {
-		mb := m.Box()
-		if b.inside || !mb.Collidable() {
+	for _, m := range game.mobs {
+		if !m.Alive() {
 			continue
 		}
+		mb := m.Box()
 		dist := b.box.CheckCollision(AxisY, &mb)
 		if dist != 0 {
-			b.inside = true
-			b.Hit(m)
+			d, ok := m.(TakeDamage)
+			if ok {
+				d.TakeDamage(b.dmg)
+			}
+			b.alive = false
+			return
 		}
 	}
-
-	return true
 }
 
 func (h *Bullet) Draw(screen *ebiten.Image, cam *Box) {

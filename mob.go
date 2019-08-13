@@ -11,34 +11,31 @@ var mobRobotDie = LoadSprites("data/mob-robot-die1.png", 0)
 
 type Mob struct {
 	box         Box
-	Life        *Life
+	life        *Life
 	vx          float64
 	walkCounter int
 	tick        int
-	deathAnim   bool
-	deathTick   int
 }
 
 func NewMob(x, y float64) *Mob {
 	return &Mob{
 		box: Box{
-			X:          x - 8,
-			Y:          y - 24,
-			W:          16,
-			H:          24,
-			collidable: true,
+			X: x - 8,
+			Y: y - 24,
+			W: 16,
+			H: 24,
 		},
-		Life:        &Life{hp: 20, x: x + 100, y: y, ownerSize: 70, alive: true, xOffset: 10},
+		life:        &Life{hp: 20, x: x + 100, y: y, ownerSize: 70, alive: true, xOffset: 10},
 		walkCounter: rand.Intn(90),
 		vx:          1,
 	}
 }
 
-func (m *Mob) ToRemove() bool      { return !m.Life.alive && !m.deathAnim }
+func (m *Mob) Alive() bool         { return m.life.alive }
 func (m *Mob) Box() Box            { return m.box }
-func (m *Mob) TakeDamage(dmg uint) { m.Life.damage += dmg }
+func (m *Mob) TakeDamage(dmg uint) { m.life.damage += dmg }
 
-func (m *Mob) Update() bool {
+func (m *Mob) Update() {
 	if m.walkCounter > 0 {
 		m.walkCounter--
 	} else {
@@ -47,17 +44,13 @@ func (m *Mob) Update() bool {
 	}
 	m.box.X += m.vx
 
-	m.Life.Update(m.box.X+8, m.box.Y-6)
+	m.life.Update(m.box.X+8, m.box.Y-6)
 	m.tick++
 
-	if !m.deathAnim {
-		m.deathAnim = !m.Life.alive
+	if !m.life.alive {
+		// spawn particle
+		game.particles = append(game.particles, NewMobDeathParticle(m.box.X, m.box.Y))
 	}
-	if m.deathAnim {
-		m.box.collidable = false
-		m.deathTick++
-	}
-	return true
 }
 
 //todo lore idea
@@ -65,33 +58,40 @@ func (m *Mob) Update() bool {
 //  use the socrates bridge paradox
 // https://en.wikipedia.org/wiki/Buridan%27s_bridge
 func (h *Mob) Draw(screen *ebiten.Image, cam *Box) {
-	h.Life.Draw(screen, cam)
+	h.life.Draw(screen, cam)
 	o := ebiten.DrawImageOptions{}
 	o.GeoM.Translate(-32+8, -44+24)
 	o.GeoM.Translate(-cam.X, -cam.Y)
 	o.GeoM.Translate(h.box.X, h.box.Y)
 
-	if h.Life.alive {
-		_ = screen.DrawImage(mobRobotIdle[h.tick/4%8], &o)
-		return
+	_ = screen.DrawImage(mobRobotIdle[h.tick/4%8], &o)
+}
+
+type MobDeathParticle struct {
+	x, y float64
+	tick int
+}
+
+func NewMobDeathParticle(x, y float64) *MobDeathParticle {
+	return &MobDeathParticle{
+		x: x,
+		y: y,
 	}
+}
 
-	if h.deathTick >= 176 {
-		h.deathTick = 0
-		h.deathAnim = false
-		return
-	}
+func (p *MobDeathParticle) Update() {
+	p.tick++
 
-	_ = screen.DrawImage(mobRobotDie[h.deathTick], &o)
+}
+func (p *MobDeathParticle) Draw(screen *ebiten.Image, cam *Box) {
+	o := ebiten.DrawImageOptions{}
+	o.GeoM.Translate(-32+8, -44+24)
+	o.GeoM.Translate(-cam.X, -cam.Y)
+	o.GeoM.Translate(p.x, p.y)
+	_ = screen.DrawImage(mobRobotDie[p.tick], &o)
+}
+func (p *MobDeathParticle) Box() Box { return Box{} }
+func (p *MobDeathParticle) Alive() bool {
+	return p.tick < 176
 
-	// // rect for debugging
-	// ebitenutil.DrawRect(
-	// 	screen,
-	// 	h.box.X-cam.X,
-	// 	h.box.Y-cam.Y,
-	// 	h.box.W,
-	// 	h.box.H,
-	// 	color.RGBA{
-	// 		0, 255, 0, 100,
-	// 	})
 }
