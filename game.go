@@ -32,7 +32,11 @@ func (g *Game) Update() {
 	g.mobs.Update()
 }
 
-func (g *Game) AddBullet(b *Bullet) {
+func (g *Game) AddParticle(p Entity) {
+	g.particles = append(g.particles, p)
+}
+
+func (g *Game) AddBullet(b Entity) {
 	g.bullets = append(g.bullets, b)
 }
 
@@ -45,8 +49,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		ScreenHeight,
 	}
 
-	g.world.Draw(screen, cam)
 	g.particles.Draw(screen, cam)
+	g.world.Draw(screen, cam)
 	g.bullets.Draw(screen, cam)
 	g.hero.Draw(screen, cam)
 	g.mobs.Draw(screen, cam)
