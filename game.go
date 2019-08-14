@@ -18,8 +18,8 @@ func NewGame() (*Game, error) {
 		switch t {
 		case '@':
 			g.hero = NewHero(x, y)
-		case 'M':
-			g.mobs = append(g.mobs, NewMob(x, y))
+		case 'm':
+			g.AddMob(NewMob(x, y))
 		}
 	})
 	return &g, nil
@@ -32,12 +32,16 @@ func (g *Game) Update() {
 	g.mobs.Update()
 }
 
-func (g *Game) AddParticle(p Entity) {
-	g.particles = append(g.particles, p)
+func (g *Game) AddParticle(e Entity) {
+	g.particles = append(g.particles, e)
 }
 
-func (g *Game) AddBullet(b Entity) {
-	g.bullets = append(g.bullets, b)
+func (g *Game) AddBullet(e Entity) {
+	g.bullets = append(g.bullets, e)
+}
+
+func (g *Game) AddMob(e Entity) {
+	g.mobs = append(g.mobs, e)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {

@@ -46,9 +46,7 @@ func (b *Bullet) Update() {
 	// collision with world
 	dist := game.world.CheckCollision(AxisY, &b.box)
 	if dist != 0 {
-		for i := 0; i < 20; i++ {
-			game.AddParticle(NewSparkParticle(b.box.X+8+dist, b.box.Y+1))
-		}
+		spawnSparkParticles(b.box.X+8+dist, b.box.Y+1)
 		b.alive = false
 		return
 	}
@@ -65,9 +63,7 @@ func (b *Bullet) Update() {
 			if ok {
 				d.TakeDamage(b.dmg)
 			}
-			for i := 0; i < 20; i++ {
-				game.AddParticle(NewSparkParticle(b.box.X+8+dist, b.box.Y+1))
-			}
+			spawnSparkParticles(b.box.X+8+dist, b.box.Y+1)
 			b.alive = false
 			return
 		}
@@ -91,6 +87,12 @@ type SparkParticle struct {
 	vx   float64
 	vy   float64
 	tick int
+}
+
+func spawnSparkParticles(x, y float64) {
+	for i := 0; i < 10; i++ {
+		game.AddParticle(NewSparkParticle(x, y))
+	}
 }
 
 func NewSparkParticle(x, y float64) *SparkParticle {

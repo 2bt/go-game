@@ -27,6 +27,7 @@ func init() {
 		'B': 3,
 		'L': 2,
 		'H': 4,
+		'^': 5,
 		'.': 8,
 	} {
 		worldTileSpriteMap[k] = worldSprites[v]
