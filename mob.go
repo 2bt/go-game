@@ -6,8 +6,13 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
-var mobRobotIdle = LoadSprites("data/mob-robot-idle.png", 0)
-var mobRobotDie = LoadSprites("data/mob-robot-die1.png", 0)
+var (
+	mobRobotIdle = LoadSprites("data/mob-robot-idle.png", 0)
+	mobRobotDie  = LoadSprites("data/mob-robot-die1.png", 0)
+
+	//make sure that Mob implements the TakeDamage interface
+	_ TakeDamage = (*Mob)(nil)
+)
 
 type Mob struct {
 	box         Box
