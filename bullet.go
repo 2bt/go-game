@@ -44,7 +44,7 @@ func (b *Bullet) Update() {
 	}
 
 	// collision with world
-	dist := game.world.CheckCollision(AxisY, &b.box)
+	dist := game.world.CheckCollision(AxisX, &b.box)
 	if dist != 0 {
 		spawnSparkParticles(b.box.X+8+dist, b.box.Y+1)
 		b.alive = false
@@ -106,6 +106,9 @@ func NewSparkParticle(x, y float64) *SparkParticle {
 
 func (p *SparkParticle) Update() {
 	p.tick--
+	p.vx *= 0.95
+	p.vy *= 0.95
+
 	p.box.X += p.vx
 	dist := game.world.CheckCollision(AxisX, &p.box)
 	if dist != 0 {

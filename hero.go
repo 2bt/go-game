@@ -110,11 +110,12 @@ func (h *Hero) Update(input Input) {
 
 		// y movement and collision
 		h.vy += Gravity
-		h.y += Clamp(h.vy, -MaxSpeedY, MaxSpeedY)
+		var vy = Clamp(h.vy, -MaxSpeedY, MaxSpeedY)
+		h.y += vy
 
-		dist = game.world.CheckCollision(AxisY, &Box{
+		dist = game.world.CheckCollisionEx(AxisY, &Box{
 			h.x - 7, h.y - 19, 14, 19,
-		})
+		}, vy)
 		if dist != 0 {
 			h.y += dist
 			h.vy = 0

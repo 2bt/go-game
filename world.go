@@ -18,6 +18,7 @@ var collidable = map[byte]bool{
 	'0': true,
 	'1': true,
 	'B': true,
+	'^': true,
 }
 
 func init() {
@@ -70,6 +71,10 @@ func (w *World) TileAt(x, y int) byte {
 }
 
 func (w *World) CheckCollision(axis Axis, box *Box) float64 {
+	return w.CheckCollisionEx(axis, box, 0)
+}
+
+func (w *World) CheckCollisionEx(axis Axis, box *Box, vel float64) float64 {
 
 	x1 := int(math.Floor(box.X / TileSize))
 	x2 := int(math.Floor((box.X + box.W) / TileSize))
@@ -85,6 +90,9 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 			if !collidable[t] {
 				continue
 			}
+			if t == '^' && axis != AxisY {
+				continue
+			}
 
 			// check collision with tile box
 			d := box.CheckCollision(axis, &Box{
@@ -93,6 +101,13 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 				TileSize,
 				TileSize,
 			})
+
+			if t == '^' {
+				if d >= 0 || vel < 0 || vel < -d {
+					continue
+				}
+			}
+
 			if math.Abs(d) > math.Abs(dist) {
 				dist = d
 			}
