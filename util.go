@@ -56,7 +56,7 @@ func LoadSprites(path string, size int) []*ebiten.Image {
 }
 
 // returns overlap. 0 means no collision
-func (a *Box) CheckCollision(axis Axis, b *Box) float64 {
+func (a *Box) CheckCollision(axis Axis, b Box) float64 {
 	if a.X >= b.X+b.W || a.Y >= b.Y+b.H || a.X+a.W <= b.X || a.Y+a.H <= b.Y {
 		return 0
 	}

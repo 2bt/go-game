@@ -44,7 +44,7 @@ func (b *Bullet) Update() {
 	}
 
 	// collision with world
-	dist := game.world.CheckCollision(AxisX, &b.box)
+	dist := game.world.CheckCollision(AxisX, b.box)
 	if dist != 0 {
 		spawnSparkParticles(b.box.X+8+dist, b.box.Y+1)
 		b.alive = false
@@ -56,8 +56,7 @@ func (b *Bullet) Update() {
 		if !m.Alive() {
 			continue
 		}
-		mb := m.Box()
-		dist := b.box.CheckCollision(AxisX, &mb)
+		dist := b.box.CheckCollision(AxisX, m.Box())
 		if dist != 0 {
 			d, ok := m.(TakeDamage)
 			if ok {
@@ -70,7 +69,7 @@ func (b *Bullet) Update() {
 	}
 }
 
-func (h *Bullet) Draw(screen *ebiten.Image, cam *Box) {
+func (h *Bullet) Draw(screen *ebiten.Image, cam Box) {
 	ebitenutil.DrawRect(
 		screen,
 		h.box.X-cam.X,
@@ -110,21 +109,21 @@ func (p *SparkParticle) Update() {
 	p.vy *= 0.95
 
 	p.box.X += p.vx
-	dist := game.world.CheckCollision(AxisX, &p.box)
+	dist := game.world.CheckCollision(AxisX, p.box)
 	if dist != 0 {
 		p.box.X += dist
 		p.vx *= -0.5
 	}
 	p.vy += Gravity
 	p.box.Y += Clamp(p.vy, -MaxSpeedY, MaxSpeedY)
-	dist = game.world.CheckCollision(AxisY, &p.box)
+	dist = game.world.CheckCollision(AxisY, p.box)
 	if dist != 0 {
 		p.box.Y += dist
 		p.vy *= -0.5
 	}
 
 }
-func (p *SparkParticle) Draw(screen *ebiten.Image, cam *Box) {
+func (p *SparkParticle) Draw(screen *ebiten.Image, cam Box) {
 	a := p.tick * 10
 	if a > 255 {
 		a = 255

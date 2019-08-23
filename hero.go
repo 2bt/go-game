@@ -11,14 +11,21 @@ var heroRunSprites = LoadSprites("data/hero-run.png", 0)
 var heroJumpSprites = LoadSprites("data/hero-jump.png", 0)
 var heroClimbSprites = LoadSprites("data/hero-climb.png", 0)
 
+type HeroState int
+
+const (
+	OnGround HeroState = iota
+	InAir
+	Climbing
+)
+
 type Hero struct {
 	x           float64
 	y           float64
 	vx          float64
 	vy          float64
 	dir         Dir
-	climbing    bool
-	inAir       bool
+	state       HeroState
 	jumpControl bool
 	oldJump     bool
 	shootDelay  int
@@ -38,6 +45,10 @@ func NewHero(x, y float64) *Hero {
 	}
 }
 
+func (h *Hero) Box() Box {
+	return Box{h.x - 7, h.y - 19, 14, 19}
+}
+
 func (h *Hero) Update(input Input) {
 
 	// turn
@@ -47,48 +58,54 @@ func (h *Hero) Update(input Input) {
 		h.dir = Left
 	}
 
-	if h.climbing {
+	if h.state == Climbing {
 
+		// snap to ladder
 		m := math.Mod(h.x, TileSize)
 		h.x += Clamp(8-m, -0.5, 0.5)
 
+		// move up/down
 		h.vy = float64(input.y)
 		h.y += h.vy
 
-		dist := game.world.CheckCollision(AxisY, &Box{
-			h.x - 7, h.y - 19, 14, 19,
-		})
+		// collision
+		dist := game.world.CheckCollision(AxisY, h.Box())
 		if dist != 0 {
 			h.y += dist
 			h.vy = 0
 			if dist < 0 {
-				h.inAir = false
-				h.climbing = false
+				h.state = OnGround
 			}
 		}
 
+		// check if we're still on a ladder
 		x := int(h.x / TileSize)
 		y := int((h.y - 0.5) / TileSize)
 		t := game.world.TileAt(x, y)
 		if t != 'L' {
-			if h.dir == Right {
-				h.x += 1
+			if h.vy < 0 {
+				// we reached the top end
+				dist := game.world.CheckCollisionEx(AxisY, h.Box(), -h.vy)
+				h.y += dist
+				h.vy = 0
+				h.state = OnGround
 			} else {
-				h.x -= 1
+				h.state = InAir
 			}
-			h.climbing = false
 		}
 
+		// let go of ladder
 		if input.jump {
-			h.inAir = true
-			h.climbing = false
+			h.state = InAir
 		}
 
 	} else {
 
+		// NOTE: movement and collision are handled the same InAir and OnGround
+
 		// x movement and collision
 		accel := 0.5
-		if h.inAir {
+		if h.state == InAir {
 			accel = 0.25
 		}
 		if input.x != 0 {
@@ -101,9 +118,7 @@ func (h *Hero) Update(input Input) {
 		}
 		h.x += h.vx
 
-		dist := game.world.CheckCollision(AxisX, &Box{
-			h.x - 7, h.y - 19, 14, 19,
-		})
+		dist := game.world.CheckCollision(AxisX, h.Box())
 		if dist != 0 {
 			h.x += dist
 		}
@@ -113,20 +128,18 @@ func (h *Hero) Update(input Input) {
 		var vy = Clamp(h.vy, -MaxSpeedY, MaxSpeedY)
 		h.y += vy
 
-		dist = game.world.CheckCollisionEx(AxisY, &Box{
-			h.x - 7, h.y - 19, 14, 19,
-		}, vy)
+		dist = game.world.CheckCollisionEx(AxisY, h.Box(), vy)
 		if dist != 0 {
 			h.y += dist
 			h.vy = 0
 			if dist < 0 {
-				h.inAir = false
+				h.state = OnGround
 			}
 		} else {
-			h.inAir = true
+			h.state = InAir
 		}
 
-		if h.inAir {
+		if h.state == InAir {
 			// jump higher
 			if h.jumpControl {
 				if !input.jump && h.vy < -1 {
@@ -138,10 +151,11 @@ func (h *Hero) Update(input Input) {
 				}
 			}
 
-		} else {
+		} else { // OnGround
+
 			// jump
 			if input.jump && !h.oldJump {
-				h.inAir = true
+				h.state = InAir
 				h.jumpControl = true
 				h.vy = -9
 			}
@@ -154,8 +168,7 @@ func (h *Hero) Update(input Input) {
 			t := game.world.TileAt(x, y)
 			m := math.Mod(h.x, TileSize)
 			if t == 'L' && m > 5 && m < 11 {
-				h.inAir = false
-				h.climbing = true
+				h.state = Climbing
 				h.vx = 0
 				h.vy = 0
 			}
@@ -178,7 +191,7 @@ func (h *Hero) Update(input Input) {
 	h.tick++
 }
 
-func (h *Hero) Draw(screen *ebiten.Image, cam *Box) {
+func (h *Hero) Draw(screen *ebiten.Image, cam Box) {
 	h.life.Draw(screen, cam)
 	o := ebiten.DrawImageOptions{}
 	o.GeoM.Translate(-16, -24)
@@ -190,12 +203,13 @@ func (h *Hero) Draw(screen *ebiten.Image, cam *Box) {
 
 	var frame *ebiten.Image
 
-	if h.climbing {
+	if h.state == Climbing {
+
 		frame = heroClimbSprites[0]
 		if h.vy != 0 {
 			frame = heroClimbSprites[h.tick/4%4]
 		}
-	} else if h.inAir {
+	} else if h.state == InAir {
 		f := 3
 		switch {
 		case h.vy < -4:
