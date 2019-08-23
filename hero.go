@@ -62,7 +62,7 @@ func (h *Hero) Update(input Input) {
 
 		// snap to ladder
 		m := math.Mod(h.x, TileSize)
-		h.x += Clamp(8-m, -0.5, 0.5)
+		h.x += Clamp(8-m, -1, 1)
 
 		// move up/down
 		h.vy = float64(input.y)
@@ -95,7 +95,7 @@ func (h *Hero) Update(input Input) {
 		}
 
 		// let go of ladder
-		if input.jump {
+		if input.jump && !h.oldJump {
 			h.state = InAir
 		}
 
@@ -162,10 +162,11 @@ func (h *Hero) Update(input Input) {
 		}
 
 		// check for latter
-		if input.y == -1 {
-			x := int(h.x / TileSize)
-			y := int((h.y - 0.5) / TileSize)
-			t := game.world.TileAt(x, y)
+		if input.y != 0 {
+			y := h.y + float64(input.y)
+			ix := int(h.x / TileSize)
+			iy := int(y / TileSize)
+			t := game.world.TileAt(ix, iy)
 			m := math.Mod(h.x, TileSize)
 			if t == 'L' && m > 5 && m < 11 {
 				h.state = Climbing
