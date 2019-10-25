@@ -62,7 +62,7 @@ func (m *Mob) Update() {
 // save the princess/prisoner but she turns into a prophet
 //  use the socrates bridge paradox
 // https://en.wikipedia.org/wiki/Buridan%27s_bridge
-func (h *Mob) Draw(screen *ebiten.Image, cam *Box) {
+func (h *Mob) Draw(screen *ebiten.Image, cam Box) {
 	h.life.Draw(screen, cam)
 	o := ebiten.DrawImageOptions{}
 	o.GeoM.Translate(-32+8, -44+24)
@@ -88,7 +88,7 @@ func (p *MobDeathParticle) Update() {
 	p.tick++
 
 }
-func (p *MobDeathParticle) Draw(screen *ebiten.Image, cam *Box) {
+func (p *MobDeathParticle) Draw(screen *ebiten.Image, cam Box) {
 	o := ebiten.DrawImageOptions{}
 	o.GeoM.Translate(-32+8, -44+24)
 	o.GeoM.Translate(-cam.X, -cam.Y)
@@ -98,5 +98,4 @@ func (p *MobDeathParticle) Draw(screen *ebiten.Image, cam *Box) {
 func (p *MobDeathParticle) Box() Box { return Box{} }
 func (p *MobDeathParticle) Alive() bool {
 	return p.tick < 44
-
 }

@@ -4,7 +4,7 @@ import "github.com/hajimehoshi/ebiten"
 
 type Entity interface {
 	Update()
-	Draw(screen *ebiten.Image, cam *Box)
+	Draw(screen *ebiten.Image, cam Box)
 	Box() Box
 	Alive() bool
 }
@@ -25,7 +25,7 @@ func (es *Entities) Update() {
 	*es = (*es)[:i]
 }
 
-func (es *Entities) Draw(screen *ebiten.Image, cam *Box) {
+func (es *Entities) Draw(screen *ebiten.Image, cam Box) {
 	for _, e := range *es {
 		e.Draw(screen, cam)
 	}

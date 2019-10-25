@@ -1,9 +1,10 @@
 package main
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
-	"image/color"
 )
 
 type Life struct {
@@ -37,7 +38,7 @@ func (h *Life) Update(x, y float64) bool {
 	return true
 }
 
-func (h *Life) Draw(screen *ebiten.Image, cam *Box) {
+func (h *Life) Draw(screen *ebiten.Image, cam Box) {
 	if h.alive {
 		ebitenutil.DrawRect(screen, h.x-1-cam.X, h.y-1-cam.Y, h.width, 2, color.RGBA{255, 0, 0, 200})
 	}

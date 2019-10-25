@@ -18,6 +18,9 @@ var collidable = map[byte]bool{
 	'0': true,
 	'1': true,
 	'B': true,
+
+	'^': true, // jump through platform
+	'L': true, // ladder
 }
 
 func init() {
@@ -69,7 +72,11 @@ func (w *World) TileAt(x, y int) byte {
 	return w.tiles[y][x]
 }
 
-func (w *World) CheckCollision(axis Axis, box *Box) float64 {
+func (w *World) CheckCollision(axis Axis, box Box) float64 {
+	return w.CheckCollisionEx(axis, box, 0)
+}
+
+func (w *World) CheckCollisionEx(axis Axis, box Box, vel float64) float64 {
 
 	x1 := int(math.Floor(box.X / TileSize))
 	x2 := int(math.Floor((box.X + box.W) / TileSize))
@@ -85,14 +92,31 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 			if !collidable[t] {
 				continue
 			}
+			if (t == '^' ||
+				t == 'L') &&
+				(axis != AxisY || vel < 0) {
+				continue
+			}
+
+			// only top end of ladder has collision
+			if t == 'L' && w.TileAt(x, y-1) == 'L' {
+				continue
+			}
 
 			// check collision with tile box
-			d := box.CheckCollision(axis, &Box{
+			d := box.CheckCollision(axis, Box{
 				float64(x * TileSize),
 				float64(y * TileSize),
 				TileSize,
 				TileSize,
 			})
+
+			if t == '^' || t == 'L' {
+				if d >= 0 || vel < -d {
+					continue
+				}
+			}
+
 			if math.Abs(d) > math.Abs(dist) {
 				dist = d
 			}
@@ -101,7 +125,7 @@ func (w *World) CheckCollision(axis Axis, box *Box) float64 {
 	return dist
 }
 
-func (w *World) Draw(screen *ebiten.Image, cam *Box) {
+func (w *World) Draw(screen *ebiten.Image, cam Box) {
 
 	x1 := int(math.Floor(cam.X / TileSize))
 	x2 := int(math.Floor((cam.X + cam.W) / TileSize))

@@ -46,7 +46,7 @@ func (g *Game) AddMob(e Entity) {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	cam := &Box{
+	cam := Box{
 		g.hero.x - ScreenWidth/2,
 		g.hero.y - ScreenHeight/2 - 30,
 		ScreenWidth,
